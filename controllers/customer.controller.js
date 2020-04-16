@@ -1,4 +1,5 @@
-const { Customer } = require('../database/models');
+const { Customer, OrderItem, Product } = require('../database/models');
+const {to}				= require('await-to-js');
 
 // Create and Save a new Customer
 exports.create = (req, res) => {
@@ -12,9 +13,10 @@ exports.create = (req, res) => {
   
   // Create a Customer
   const customer = {
+		id: req.body.data.attributes.id,
     full_name: req.body.data.attributes.full_name,
     username: req.body.data.attributes.username,
-		email: req.body.data.attributes.email,
+		address: req.body.data.attributes.address,
     phone_number: req.body.data.attributes.phone_number
   };
 
@@ -61,7 +63,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Customer.findOne({ where: { username: id } })
+  Customer.findByPk(id)
     .then(data => {
       res.send({
         message: "success retrieve data",
@@ -74,6 +76,44 @@ exports.findOne = (req, res) => {
         message: "Error retrieving Customer with id=" + id
       });
     });
+};
+
+// Retrieve all Orders
+exports.findOrders = async (req, res) => {
+	const id = req.params.id;
+	let err, cst;
+	[err, cst] = await to(Customer.findByPk(id));
+	if (err) {
+		return res.status(500).send({ message: err.message });
+	}
+	
+	let orders;
+	[err, orders] = await to(cst.getOrders({
+		where: {status: 'accepted'},
+		attributes:
+			['id', ['createdAt', 'date'], 'status'],
+		order: [['createdAt', 'ASC']],
+		include: [{
+			model: OrderItem,
+			as: 'order_detail',
+			attributes: ['id', 'quantity'],
+			include: {
+				model: Product,
+				attributes: ['id', 'name', 'price']
+			}
+		}]
+	}));
+	if (err) {
+		console.log(err);
+		return res.status(500).send({ message: err.message });
+	}
+	let data = JSON.stringify(orders, null, 2)
+	console.log('data = ', data);
+	res.send({
+		message: "success retrieve data",
+		status: true,
+		data: orders
+	});
 };
 
 // Update a Customer by the id in the request

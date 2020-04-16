@@ -13,7 +13,6 @@ exports.create = (req, res) => {
 	// Create an Order
   const order = {
     user_id: req.body.data.attributes.user_id,
-    driver_id: req.body.data.attributes.driver_id,
 		status: req.body.data.attributes.status,
 		order_detail: req.body.data.attributes.order_detail
   };
@@ -102,6 +101,45 @@ exports.findOne = (req, res) => {
         message: "Error retrieving Order with id=" + id
       });
     });
+};
+
+// Add item to Order with id
+exports.addItem = (req, res) => {
+  const id = req.params.id;
+	
+	OrderItem.create(req.body.data.attributes)
+		.then(item => {
+			Order.findByPk(id)
+				.then(order => {
+					order.addOrder_detail(item)
+						.then(data => {
+							//console.log(data);
+							res.send({
+								message: "success add item",
+								status: true,
+								data: data
+							});
+						})
+						.catch(err => {
+							console.log(err.message);
+							res.status(500).send({
+								message: "Error add item to Order with id=" + id
+							});
+						});
+				})
+				.catch(err => {
+					console.log(err.message);
+					res.status(500).send({
+						message: "Error add item to Order with id=" + id
+					});
+				});
+		})
+		.catch(err => {
+			console.log(err.message);
+			res.status(500).send({
+				message: "Error add item to Order with id=" + id
+			});
+		});
 };
 
 // Update a Order by the id in the request

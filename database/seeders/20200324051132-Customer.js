@@ -5,17 +5,19 @@ module.exports = {
 		return queryInterface.bulkInsert('Customers', 
 			[
 				{
+					id: 1,
 					full_name: 'Mia Huljanah',
 					username: 'miahun',
-					email: 'miahun@fakemail.com',
+					address: 'miahun@fakemail.com',
 					phone_number: '08155559890',
 					createdAt: new Date(),
           updatedAt: new Date()
 				},
 				{
+					id: 2,
 					full_name: 'Rashif Ilmi Nurzaman',
 					username: 'rashzam',
-					email: 'rashzam@fakemail.com',
+					address: 'rashzam@fakemail.com',
 					phone_number: '0812598837',
 					createdAt: new Date(),
           updatedAt: new Date()

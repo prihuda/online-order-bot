@@ -11,6 +11,9 @@ module.exports = app => {
 
   // Get Customer By Id
   router.get("/:id", customer.findOne);
+	
+	// Retrieve all Orders
+  router.get("/:id/orders", customer.findOrders);
 
   // Update Customer Data
   router.put("/:id", customer.update);

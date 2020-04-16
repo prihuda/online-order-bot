@@ -11,6 +11,9 @@ module.exports = app => {
 
   // Retrieve a single Order with id
   router.get("/:id", order.findOne);
+	
+	// Add item to Order with id
+  router.post("/:id", order.addItem);
 
   // Update a Order with id
   router.put("/:id", order.update);
